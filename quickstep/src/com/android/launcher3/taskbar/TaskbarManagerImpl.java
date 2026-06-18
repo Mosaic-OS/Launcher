@@ -165,9 +165,18 @@ public class TaskbarManagerImpl implements DisplayDecorationListener {
 
     private static final Uri NAV_BAR_KIDS_MODE = Settings.Secure.getUriFor(
             Settings.Secure.NAV_BAR_KIDS_MODE);
+    
+    public static final Uri PILL_LENGTH_MODE_URI = Settings.Secure.getUriFor(
+            Settings.Secure.PILL_LENGTH_MODE);
+    
+    public static final Uri PILL_HEIGHT_MODE_URI = Settings.Secure.getUriFor(
+            Settings.Secure.PILL_HEIGHT_MODE);
 
     public static final LooperExecutor TASKBAR_UI_THREAD =
             new LooperExecutor("TASKBAR_UI_THREAD", THREAD_PRIORITY_FOREGROUND);
+    
+    public static final Uri SHOW_NAVIGATION_PILL_URI = Settings.Secure.getUriFor(
+            Settings.Secure.SHOW_NAVIGATION_PILL);
 
     private final Context mBaseContext;
     private final WindowManager mBaseWindowManager;
@@ -321,6 +330,8 @@ public class TaskbarManagerImpl implements DisplayDecorationListener {
         debugPrimaryTaskbar("Settings changed! Recreating Taskbar!");
         recreateTaskbars();
     };
+    
+    private final SettingsCache.OnChangeListener mOnTaskBarChangeListener;
 
     private final DesktopVisibilityController.TaskbarDesktopModeListener
             mTaskbarDesktopModeListener =
@@ -447,6 +458,10 @@ public class TaskbarManagerImpl implements DisplayDecorationListener {
         mNavCallbacks = navCallbacks;
         mDisplaysWithDecorationsRepositoryCompat = displaysWithDecorationsRepositoryCompat;
 
+        mOnTaskBarChangeListener = c -> {
+            System.exit(0);
+        };
+
         // Set up primary display.
         debugPrimaryTaskbar("TaskbarManager constructor");
         mDisplayManager = mBaseContext.getSystemService(DisplayManager.class);
@@ -464,6 +479,12 @@ public class TaskbarManagerImpl implements DisplayDecorationListener {
                 .register(USER_SETUP_COMPLETE_URI, mOnSettingsChangeListener);
         SettingsCache.INSTANCE.get(mPrimaryWindowContext)
                 .register(NAV_BAR_KIDS_MODE, mOnSettingsChangeListener);
+        SettingsCache.INSTANCE.get(mPrimaryWindowContext)
+                .register(SHOW_NAVIGATION_PILL_URI, mOnTaskBarChangeListener);
+        SettingsCache.INSTANCE.get(mPrimaryWindowContext)
+                .register(PILL_LENGTH_MODE_URI, mOnTaskBarChangeListener);
+        SettingsCache.INSTANCE.get(mPrimaryWindowContext)
+                .register(PILL_HEIGHT_MODE_URI, mOnTaskBarChangeListener);
         if (DesktopExperienceFlags.ENABLE_SYS_DECORS_CALLBACKS_VIA_WM.isTrue()
                 && DesktopExperienceFlags.ENABLE_DISPLAY_CONTENT_MODE_MANAGEMENT.isTrue()) {
             displaysWithDecorationsRepositoryCompat
@@ -1195,6 +1216,12 @@ public class TaskbarManagerImpl implements DisplayDecorationListener {
                 .unregister(USER_SETUP_COMPLETE_URI, mOnSettingsChangeListener);
         SettingsCache.INSTANCE.get(mPrimaryWindowContext)
                 .unregister(NAV_BAR_KIDS_MODE, mOnSettingsChangeListener);
+        SettingsCache.INSTANCE.get(mPrimaryWindowContext)
+                .unregister(SHOW_NAVIGATION_PILL_URI, mOnTaskBarChangeListener);
+        SettingsCache.INSTANCE.get(mPrimaryWindowContext)
+                .unregister(PILL_LENGTH_MODE_URI, mOnTaskBarChangeListener);
+        SettingsCache.INSTANCE.get(mPrimaryWindowContext)
+                .unregister(PILL_HEIGHT_MODE_URI, mOnTaskBarChangeListener);
         if (DesktopExperienceFlags.ENABLE_SYS_DECORS_CALLBACKS_VIA_WM.isTrue()
                 && DesktopExperienceFlags.ENABLE_DISPLAY_CONTENT_MODE_MANAGEMENT.isTrue()) {
             mDisplaysWithDecorationsRepositoryCompat.unregisterDisplayDecorationListener(this);

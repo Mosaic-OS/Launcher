@@ -1,5 +1,8 @@
 # Launcher3
 
+This is an independent project based on [GrapheneOS Launcher](https://github.com/GrapheneOS/platform_packages_apps_Launcher3). It is **not affiliated with, endorsed by, or maintained by the GrapheneOS team** - all credit for the original application goes to its authors.
+
+
 ## Running Launcher3QuickStepTests
 
 This will run the QuickStep test files that are left in AOSP (used by Google's Pixel Launcher, 

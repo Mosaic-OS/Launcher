@@ -21,6 +21,9 @@ import static android.view.WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BA
 import static com.android.launcher3.EncryptionType.ENCRYPTED;
 import static com.android.launcher3.LauncherPrefs.nonRestorableItem;
 import static com.android.launcher3.taskbar.TaskbarDesktopExperienceFlags.enableAutoStashConnectedDisplayTaskbar;
+import static com.android.launcher3.taskbar.TaskbarManagerImpl.PILL_HEIGHT_MODE_URI;
+import static com.android.launcher3.taskbar.TaskbarManagerImpl.PILL_LENGTH_MODE_URI;
+import static com.android.launcher3.taskbar.TaskbarManagerImpl.SHOW_NAVIGATION_PILL_URI;
 import static com.android.launcher3.taskbar.Utilities.getShapedTaskbarRadius;
 import static com.android.systemui.shared.system.QuickStepContract.SYSUI_STATE_NAV_BAR_HIDDEN;
 
@@ -32,6 +35,8 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Outline;
 import android.graphics.Rect;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.View;
 import android.view.ViewOutlineProvider;
 
@@ -47,14 +52,18 @@ import com.android.launcher3.anim.RevealOutlineAnimation;
 import com.android.launcher3.anim.RoundedRectRevealOutlineProvider;
 import com.android.launcher3.util.Executors;
 import com.android.launcher3.util.MultiValueAlpha;
+import com.android.launcher3.util.SettingsCache;
 import com.android.quickstep.NavHandle;
 import com.android.quickstep.TopTaskTracker;
 import com.android.systemui.shared.system.QuickStepContract.SystemUiStateFlags;
 import com.android.systemui.shared.system.TaskStackChangeListener;
 import com.android.systemui.shared.system.TaskStackChangeListeners;
 import com.android.wm.shell.shared.handles.RegionSamplingHelper;
+import android.provider.Settings;
 
 import java.io.PrintWriter;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Handles properties/data collection, then passes the results to our stashed handle View to render.
@@ -87,7 +96,7 @@ public class StashedHandleViewController implements TaskbarControllers.LoggableT
     private final LauncherPrefs mPrefs;
     private final StashedHandleView mStashedHandleView;
     private int mStashedHandleWidth;
-    private final int mStashedHandleHeight;
+    private int mStashedHandleHeight;
     @Nullable
     private RegionSamplingHelper mRegionSamplingHelper;
     private final MultiValueAlpha mTaskbarStashedHandleAlpha;
@@ -116,6 +125,18 @@ public class StashedHandleViewController implements TaskbarControllers.LoggableT
     private float mTranslationYForSwipe;
     private float mTranslationYForStash;
     private TaskStackChangeListener mTaskStackChangeListener;
+    
+    // Burn-in protection
+    private Timer mBurnInTimer;
+    private float mTranslationXForBurnIn;
+    private float mTranslationYForBurnIn;
+    private float mHorizontalMaxShift;
+    private float mVerticalMaxShift;
+    private float mHorizontalShiftStep;
+    private float mVerticalShiftStep;
+    private final Handler mUiHandler = new Handler(Looper.getMainLooper());
+    private boolean mBurnInProtectionEnabled;
+    private long mBurnInShiftIntervalMs;
 
     public StashedHandleViewController(TaskbarActivityContext activity,
             StashedHandleView stashedHandleView) {
@@ -126,27 +147,78 @@ public class StashedHandleViewController implements TaskbarControllers.LoggableT
         mTaskbarStashedHandleAlpha.setUpdateVisibility(true);
         mStashedHandleView.updateHandleColor(
                 mPrefs.get(STASHED_HANDLE_REGION_IS_DARK), false /* animate */);
+                
         final Resources resources = mActivity.getResources();
-        mStashedHandleHeight = resources.getDimensionPixelSize(
-                R.dimen.taskbar_stashed_handle_height);
+        float density = resources.getDisplayMetrics().density;
+        
+        mBurnInProtectionEnabled = true;
+        mBurnInShiftIntervalMs = 60000L;
+        
+        mHorizontalMaxShift = 12 * density;
+        mVerticalMaxShift = 6 * density;
+
+        mHorizontalShiftStep = mHorizontalMaxShift / 3f;
+        mVerticalShiftStep = mVerticalMaxShift / 3f;
     }
 
     public void init(TaskbarControllers controllers) {
         mControllers = controllers;
         DeviceProfile deviceProfile = mActivity.getDeviceProfile();
         Resources resources = mActivity.getResources();
+        int handleHeightMode = Settings.Secure.getInt(
+            mActivity.getContentResolver(),
+            Settings.Secure.PILL_HEIGHT_MODE,
+            3);
+        if (handleHeightMode == 0) {
+            mStashedHandleHeight =
+                resources.getDimensionPixelSize(R.dimen.taskbar_stashed_handle_height_smallest);
+        } else if (handleHeightMode == 1) {
+            mStashedHandleHeight =
+                resources.getDimensionPixelSize(R.dimen.taskbar_stashed_handle_height_smaller);
+        } else if (handleHeightMode == 2) {
+            mStashedHandleHeight =
+                resources.getDimensionPixelSize(R.dimen.taskbar_stashed_handle_height_small);
+        } else if (handleHeightMode == 4) {
+            mStashedHandleHeight =
+                resources.getDimensionPixelSize(R.dimen.taskbar_stashed_handle_height_tall);
+        } else {
+            mStashedHandleHeight =
+                resources.getDimensionPixelSize(R.dimen.taskbar_stashed_handle_height);
+        }
+        int handleWidthMode = Settings.Secure.getInt(
+            mActivity.getContentResolver(),
+            Settings.Secure.PILL_LENGTH_MODE,
+            1);
         if (mActivity.isPhoneGestureNavMode() || mActivity.isTinyTaskbar()
                 || mActivity.isBubbleBarOnPhone()) {
             mTaskbarSize = resources.getDimensionPixelSize(R.dimen.taskbar_phone_size);
-            mStashedHandleWidth =
+            if (handleWidthMode == 0) {
+                mStashedHandleWidth =
+                    resources.getDimensionPixelSize(R.dimen.taskbar_stashed_small_screen_short);
+            } else if (handleWidthMode == 2) {
+                mStashedHandleWidth =
+                    resources.getDimensionPixelSize(R.dimen.taskbar_stashed_small_screen_long);
+            } else {
+                mStashedHandleWidth =
                     resources.getDimensionPixelSize(R.dimen.taskbar_stashed_small_screen);
+            }
         } else {
             mTaskbarSize = deviceProfile.getTaskbarProfile().getHeight();
-            mStashedHandleWidth = resources
+            if (handleWidthMode == 0) {
+                mStashedHandleWidth = resources
+                    .getDimensionPixelSize(R.dimen.taskbar_stashed_handle_width_short);
+            } else if (handleWidthMode == 2) {
+                mStashedHandleWidth = resources
+                    .getDimensionPixelSize(R.dimen.taskbar_stashed_handle_width_long);
+            } else {
+                mStashedHandleWidth = resources
                     .getDimensionPixelSize(R.dimen.taskbar_stashed_handle_width);
+            }
         }
         int taskbarBottomMargin = deviceProfile.getTaskbarProfile().getBottomMargin();
-        mStashedHandleView.getLayoutParams().height = mTaskbarSize + taskbarBottomMargin;
+        mStashedHandleView.getLayoutParams().height =
+                SettingsCache.INSTANCE.get(mActivity).getValue(SHOW_NAVIGATION_PILL_URI)
+                ? mTaskbarSize + taskbarBottomMargin : 1;
 
         mTaskbarStashedHandleAlpha.get(ALPHA_INDEX_STASHED).setValue(
                 mActivity.isPhoneGestureNavMode() ? 1 : 0);
@@ -184,6 +256,7 @@ public class StashedHandleViewController implements TaskbarControllers.LoggableT
         if (mActivity.isPhoneGestureNavMode()) {
             onIsStashedChanged(true);
         }
+        startBurnInTimer();
         if (!mActivity.isPrimaryDisplay() && enableAutoStashConnectedDisplayTaskbar.isTrue()) {
             mTaskStackChangeListener = new TaskStackChangeListener() {
                 @Override
@@ -227,6 +300,7 @@ public class StashedHandleViewController implements TaskbarControllers.LoggableT
             mRegionSamplingHelper.stopAndDestroy();
         }
         mRegionSamplingHelper = null;
+        stopBurnInTimer();
         if (mTaskStackChangeListener != null) {
             TaskStackChangeListeners.getInstance().unregisterTaskStackListener(
                     mTaskStackChangeListener);
@@ -342,7 +416,8 @@ public class StashedHandleViewController implements TaskbarControllers.LoggableT
     }
 
     private void updateTranslationY() {
-        mStashedHandleView.setTranslationY(mTranslationYForSwipe + mTranslationYForStash);
+        mStashedHandleView.setTranslationX(mTranslationXForBurnIn);
+        mStashedHandleView.setTranslationY(mTranslationYForSwipe + mTranslationYForStash + mTranslationYForBurnIn);
     }
 
     /**
@@ -432,5 +507,43 @@ public class StashedHandleViewController implements TaskbarControllers.LoggableT
     @Override
     public Rect getBoundsOnScreen() {
         return mStashedHandleView.getSampledRegion();
+    }
+    
+    private void startBurnInTimer() {
+        if (!mBurnInProtectionEnabled || mBurnInTimer != null)
+		return;
+
+        mBurnInTimer = new Timer();
+        mBurnInTimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                mUiHandler.post(() -> shiftHandle());
+            }
+        }, 0, mBurnInShiftIntervalMs);
+    }
+
+    private void stopBurnInTimer() {
+        if (mBurnInTimer != null) {
+            mBurnInTimer.cancel();
+            mBurnInTimer = null;
+        }
+    }
+
+    private void shiftHandle() {
+        // Horizontal shift logic
+        mTranslationXForBurnIn += mHorizontalShiftStep;
+        if (mTranslationXForBurnIn >= mHorizontalMaxShift ||
+            mTranslationXForBurnIn <= -mHorizontalMaxShift) {
+            mHorizontalShiftStep *= -1;
+        }
+
+        // Vertical shift logic
+        mTranslationYForBurnIn += mVerticalShiftStep;
+        if (mTranslationYForBurnIn >= mVerticalMaxShift ||
+            mTranslationYForBurnIn <= -mVerticalMaxShift) {
+            mVerticalShiftStep *= -1;
+        }
+
+        updateTranslationY();
     }
 }

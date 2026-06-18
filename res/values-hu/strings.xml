@@ -233,4 +233,6 @@
     <string name="four_sided_cookie_shape_title" msgid="3275212586290522151">"4 oldalú süti"</string>
     <string name="seven_sided_cookie_shape_title" msgid="4862560582029671668">"7 oldalú süti"</string>
     <string name="arch_shape_title" msgid="2213843822192871318">"Boltív"</string>
+	<string name="pref_dt_gesture_title">Dupla érintésre alvó mód</string>
+    <string name="pref_dt_gesture_summary">Koppintson duplán üres területre a képernyő kikapcsolásához</string>
 </resources>
