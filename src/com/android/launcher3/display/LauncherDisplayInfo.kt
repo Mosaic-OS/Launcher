@@ -94,6 +94,8 @@ constructor(
 
     @JvmField val isNightModeActive: Boolean = config.isNightModeActive
 
+    @JvmField val isRotationAllowed: Boolean = true
+
     // Used for testing
     init {
 

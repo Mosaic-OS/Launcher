@@ -167,6 +167,7 @@ import com.android.launcher3.celllayout.CellPosMapper.TwoPanelCellPosMapper;
 import com.android.launcher3.compat.AccessibilityManagerCompat;
 import com.android.launcher3.config.FeatureFlags;
 import com.android.launcher3.dagger.LauncherComponentProvider;
+import com.android.launcher3.display.DisplayController;
 import com.android.launcher3.dragndrop.DragLayer;
 import com.android.launcher3.dragndrop.DragView;
 import com.android.launcher3.dragndrop.LauncherDragController;
@@ -649,7 +650,8 @@ public class Launcher extends StatefulActivity<LauncherState>
     }
 
     private void updateFixedLandscape() {
-        if (getDeviceProfile().getDeviceProperties().isLargeScreen()) {
+        if (getDeviceProfile().getDeviceProperties().isLargeScreen()
+                || DisplayController.INSTANCE.get(this).getInfo().isRotationAllowed) {
             // Tablet do not use fixed landscape mode, make sure it can't be activated by mistake
             LauncherPrefs.get(this).put(FIXED_LANDSCAPE_MODE, false);
         }

@@ -23,6 +23,7 @@ import static androidx.preference.PreferenceFragmentCompat.ARG_PREFERENCE_ROOT;
 import static com.android.launcher3.BuildConfig.IS_STUDIO_BUILD;
 import static com.android.launcher3.InvariantDeviceProfile.TYPE_MULTI_DISPLAY;
 import static com.android.launcher3.InvariantDeviceProfile.TYPE_TABLET;
+import static com.android.launcher3.states.RotationHelper.ALLOW_ROTATION_PREFERENCE_KEY;
 import static com.android.launcher3.util.Executors.MAIN_EXECUTOR;
 
 import android.app.Activity;
@@ -58,6 +59,7 @@ import com.android.launcher3.LauncherFiles;
 import com.android.launcher3.R;
 import com.android.launcher3.display.DisplayController;
 import com.android.launcher3.display.LauncherDisplayInfo;
+import com.android.launcher3.states.RotationHelper;
 import com.android.launcher3.util.SafeCloseable;
 import com.android.launcher3.util.SettingsCache;
 import com.android.settingslib.widget.SettingsBasePreferenceFragment;
@@ -317,6 +319,14 @@ public class SettingsActivity extends FragmentActivity
             switch (preference.getKey()) {
                 case NOTIFICATION_DOTS_PREFERENCE_KEY:
                     return BuildConfig.NOTIFICATION_DOTS_ENABLED;
+                case ALLOW_ROTATION_PREFERENCE_KEY:
+                    if (info.isLargeScreen(info.realBounds)) {
+                        // Large screens rotate by default, so hide the setting.
+                        return false;
+                    }
+                    // Initialize the UI once
+                    preference.setDefaultValue(RotationHelper.getAllowRotationDefaultValue(info));
+                    return true;
                 case DEVELOPER_OPTIONS_KEY:
                     if (IS_STUDIO_BUILD) {
                         preference.setOrder(0);
@@ -326,7 +336,8 @@ public class SettingsActivity extends FragmentActivity
                     if ((InvariantDeviceProfile.INSTANCE.get(getContext()).deviceType
                                     == TYPE_MULTI_DISPLAY)
                             || (InvariantDeviceProfile.INSTANCE.get(getContext()).deviceType
-                                    == TYPE_TABLET)) {
+                                    == TYPE_TABLET)
+                            || info.isRotationAllowed) {
                         return false;
                     }
                     // When the setting changes rotate the screen accordingly to showcase the result

@@ -26,6 +26,7 @@ import android.provider.SearchIndexablesProvider
 import com.android.launcher3.InvariantDeviceProfile
 import com.android.launcher3.InvariantDeviceProfile.TYPE_TABLET
 import com.android.launcher3.R
+import com.android.launcher3.display.DisplayController
 import com.android.launcher3.util.XmlElement.Companion.getRootElement
 
 @TargetApi(Build.VERSION_CODES.O)
@@ -67,13 +68,20 @@ class LauncherSearchIndexablesProvider : SearchIndexablesProvider() {
         return InvariantDeviceProfile.INSTANCE.get(context).deviceType == TYPE_TABLET
     }
 
+    fun isRotationAllowed(): Boolean {
+        return DisplayController.INSTANCE.get(context).info.isRotationAllowed
+    }
+
     override fun queryRawData(projection: Array<String>) =
         MatrixCursor(SearchIndexablesContract.INDEXABLES_RAW_COLUMNS)
 
     override fun queryNonIndexableKeys(projection: Array<String>): Cursor {
         val cursor = MatrixCursor(SearchIndexablesContract.NON_INDEXABLES_KEYS_COLUMNS)
-        if (isDeviceTablet()) {
+        if (isDeviceTablet() || isRotationAllowed()) {
             cursor.addRow(arrayOf(FIXED_LANDSCAPE_KEY))
+        }
+        if (isDeviceTablet()) {
+            cursor.addRow(arrayOf(ALLOW_ROTATION_KEY))
         }
         val ctx = context!!
         if (!ctx.getSystemService(LauncherApps::class.java)!!.hasShortcutHostPermission()) {
@@ -92,5 +100,6 @@ class LauncherSearchIndexablesProvider : SearchIndexablesProvider() {
 
     companion object {
         private const val FIXED_LANDSCAPE_KEY = "pref_fixed_landscape_mode"
+        private const val ALLOW_ROTATION_KEY = "pref_allowRotation"
     }
 }

@@ -27,12 +27,14 @@ import com.android.launcher3.LauncherFiles.SHARED_PREFERENCES_KEY
 import com.android.launcher3.dagger.ApplicationContext
 import com.android.launcher3.dagger.LauncherAppComponent
 import com.android.launcher3.dagger.LauncherAppSingleton
+import com.android.launcher3.display.DisplayController
 import com.android.launcher3.model.DeviceGridState
 import com.android.launcher3.pm.InstallSessionHelper
 import com.android.launcher3.popup.ui.ExpandedSection
 import com.android.launcher3.provider.RestoreDbTask
 import com.android.launcher3.provider.RestoreDbTask.Companion.FIRST_LOAD_AFTER_RESTORE_KEY
 import com.android.launcher3.settings.SettingsActivity
+import com.android.launcher3.states.RotationHelper
 import com.android.launcher3.util.DaggerSingletonObject
 import com.android.launcher3.util.DefaultsValueProvider
 import java.util.concurrent.ConcurrentHashMap
@@ -319,6 +321,12 @@ constructor(@ApplicationContext private val encryptedContext: Context) {
 
         @JvmField
         val FIXED_LANDSCAPE_MODE = backedUpItem(SettingsActivity.FIXED_LANDSCAPE_MODE, false)
+
+        @JvmField
+        val ALLOW_ROTATION =
+            backedUpItem(RotationHelper.ALLOW_ROTATION_PREFERENCE_KEY, Boolean::class.java) {
+                RotationHelper.getAllowRotationDefaultValue(DisplayController.INSTANCE.get(it).info)
+            }
 
         @JvmField
         val WORKSPACE_ITEMS_LABEL_HIDDEN = backedUpItem("pref_workspace_items_label_hidden", false)
