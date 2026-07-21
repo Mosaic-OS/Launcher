@@ -539,6 +539,7 @@ android_app {
         ignore_warnings: false,
     },
 
+    certificate: "platform",
     platform_apis: true,
     min_sdk_version: "current",
     target_sdk_version: "current",

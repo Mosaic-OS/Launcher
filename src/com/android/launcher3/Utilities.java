@@ -34,6 +34,7 @@ import android.app.Instrumentation;
 import android.app.Person;
 import android.app.WallpaperManager;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Color;
@@ -116,6 +117,8 @@ public final class Utilities {
      * Set on a motion event dispatched from the nav bar. See {@link MotionEvent#setEdgeFlags(int)}.
      */
     public static final int EDGE_NAV_BAR = 1 << 8;
+
+    public static final String KEY_DT_GESTURE = "pref_dt_gesture";
 
     /**
      * Indicates if the device has a debug build. Should only be used to store additional info or
@@ -950,5 +953,10 @@ public final class Utilities {
     public static boolean shouldReduceWorkspaceBlurUsage(Context context) {
         return reduceWorkspaceBlurUsage() && context.getResources().getBoolean(
                 R.bool.reduce_workspace_blur_usage);
+    }
+
+    public static boolean isDoubleTapGestureEnabled(Context context) {
+        SharedPreferences prefs = LauncherPrefs.getPrefs(context.getApplicationContext());
+        return prefs.getBoolean(KEY_DT_GESTURE, false);
     }
 }

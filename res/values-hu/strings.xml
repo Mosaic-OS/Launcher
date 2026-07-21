@@ -275,4 +275,6 @@
     <string name="organizer_create_screen_title" msgid="1052454457895703433">"Képernyő létrehozása"</string>
     <string name="organizer_create_screen_description" msgid="3224132391919219061">"Válasszon kategóriát az alkalmazások és modulok telefonról való hozzáadásához"</string>
     <string name="organizer_choose_layout_title" msgid="127228966942084947">"Elrendezés kiválasztása"</string>
+    <string name="pref_dt_gesture_title">Dupla érintésre alvó mód</string>
+    <string name="pref_dt_gesture_summary">Koppintson duplán üres területre a képernyő kikapcsolásához</string>
 </resources>
