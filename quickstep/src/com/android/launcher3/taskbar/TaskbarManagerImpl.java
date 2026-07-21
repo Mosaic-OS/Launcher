@@ -138,6 +138,13 @@ public class TaskbarManagerImpl {
     private static final Uri NAV_BAR_KIDS_MODE = Settings.Secure.getUriFor(
             Settings.Secure.NAV_BAR_KIDS_MODE);
 
+    public static final Uri SHOW_NAVIGATION_PILL_URI = Settings.Secure.getUriFor(
+            Settings.Secure.SHOW_NAVIGATION_PILL);
+    public static final Uri PILL_LENGTH_MODE_URI = Settings.Secure.getUriFor(
+            Settings.Secure.PILL_LENGTH_MODE);
+    public static final Uri PILL_HEIGHT_MODE_URI = Settings.Secure.getUriFor(
+            Settings.Secure.PILL_HEIGHT_MODE);
+
     private final Context mBaseContext;
     private final int mPrimaryDisplayId;
     private final TaskbarNavButtonCallbacks mNavCallbacks;
@@ -344,6 +351,18 @@ public class TaskbarManagerImpl {
                 getTaskbarUiThread(),
                 v -> onSettingChanged(v, TaskbarActivityContext::isInKidsMode));
         cleanupTasks.addCloseable(getTaskbarUiThread(), navBarKidsModeSafeCloseable);
+
+        // Navigation pill visibility/size changes the taskbar geometry; rebuild the taskbars.
+        for (Uri pillUri : new Uri[] {
+                SHOW_NAVIGATION_PILL_URI, PILL_LENGTH_MODE_URI, PILL_HEIGHT_MODE_URI}) {
+            var pillSafeCloseable = settingsCache.getListenableRef(pillUri).forEach(
+                    getTaskbarUiThread(),
+                    v -> {
+                        recreateTaskbars();
+                        return Unit.INSTANCE;
+                    });
+            cleanupTasks.addCloseable(getTaskbarUiThread(), pillSafeCloseable);
+        }
 
         SimpleBroadcastReceiver shutdownReceiver = new SimpleBroadcastReceiver(
                 mBaseContext,

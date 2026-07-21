@@ -18,11 +18,14 @@ package com.android.launcher3.taskbar.bubbles;
 import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
 
+import static com.android.launcher3.taskbar.StashedHandleViewController.pillHandleHeightDimen;
+
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.annotation.Nullable;
 import android.content.res.Resources;
+import android.provider.Settings;
 import android.graphics.Outline;
 import android.graphics.Rect;
 import android.view.MotionEvent;
@@ -97,10 +100,17 @@ public class BubbleStashedHandleViewController {
 
         DeviceProfile deviceProfile = mActivity.getDeviceProfile();
         Resources resources = mActivity.getResources();
+        int handleHeightMode = Settings.Secure.getInt(mActivity.getContentResolver(),
+                Settings.Secure.PILL_HEIGHT_MODE, 3);
         mStashedHandleHeight = resources.getDimensionPixelSize(
-                R.dimen.bubblebar_stashed_handle_height);
+                handleHeightMode == 3 ? R.dimen.bubblebar_stashed_handle_height
+                        : pillHandleHeightDimen(handleHeightMode));
+        int handleWidthMode = Settings.Secure.getInt(mActivity.getContentResolver(),
+                Settings.Secure.PILL_LENGTH_MODE, 1);
         mStashedHandleWidth = resources.getDimensionPixelSize(
-                R.dimen.bubblebar_stashed_handle_width);
+                handleWidthMode == 0 ? R.dimen.bubblebar_stashed_handle_width_short
+                : handleWidthMode == 2 ? R.dimen.bubblebar_stashed_handle_width_long
+                : R.dimen.bubblebar_stashed_handle_width);
 
         int barSize = resources.getDimensionPixelSize(R.dimen.bubblebar_size);
         // Use the max translation for bubble bar whether it is on the home screen or in app.

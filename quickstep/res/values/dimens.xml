@@ -650,4 +650,18 @@
     -->
     <dimen name="desktop_windowing_freeform_task_rounded_corner_radius">16dp</dimen>
 
+    <!-- Navigation pill: extra lengths -->
+    <dimen name="taskbar_stashed_small_screen_short">72dp</dimen>
+    <dimen name="taskbar_stashed_small_screen_long">140dp</dimen>
+    <dimen name="taskbar_stashed_handle_width_short">108dp</dimen>
+    <dimen name="taskbar_stashed_handle_width_long">300dp</dimen>
+    <dimen name="bubblebar_stashed_handle_width_short">35dp</dimen>
+    <dimen name="bubblebar_stashed_handle_width_long">75dp</dimen>
+
+    <!-- Navigation pill: extra heights -->
+    <dimen name="taskbar_stashed_handle_height_smallest">1dp</dimen>
+    <dimen name="taskbar_stashed_handle_height_smaller">2dp</dimen>
+    <dimen name="taskbar_stashed_handle_height_small">3dp</dimen>
+    <dimen name="taskbar_stashed_handle_height_tall">5dp</dimen>
+
 </resources>

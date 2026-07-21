@@ -38,6 +38,7 @@ import static com.android.launcher3.logging.StatsLogManager.LauncherEvent.LAUNCH
 import static com.android.launcher3.taskbar.TaskbarAutohideSuspendController.FLAG_AUTOHIDE_SUSPEND_DRAGGING;
 import static com.android.launcher3.taskbar.TaskbarAutohideSuspendController.FLAG_AUTOHIDE_SUSPEND_FULLSCREEN;
 import static com.android.launcher3.taskbar.TaskbarStashController.FLAG_IN_SECONDARY_LAUNCHER_ON_CD;
+import static com.android.launcher3.taskbar.TaskbarManagerImpl.SHOW_NAVIGATION_PILL_URI;
 import static com.android.launcher3.taskbar.TaskbarStashController.FLAG_STASHED_IN_APP_AUTO;
 import static com.android.launcher3.taskbar.TaskbarStashController.SHOULD_BUBBLES_FOLLOW_DEFAULT_VALUE;
 import static com.android.launcher3.testing.shared.ResourceUtils.getBoolByName;
@@ -1608,10 +1609,14 @@ public class TaskbarActivityContext extends BaseTaskbarContext {
     public int getDefaultTaskbarWindowSize() {
         Resources resources = getResources();
 
+        boolean showPill = SettingsCache.INSTANCE.get(this).getValue(SHOW_NAVIGATION_PILL_URI);
+        if (isGestureNav() && !showPill) {
+            return 0;
+        }
         if (isPhoneMode()) {
-            return isThreeButtonNav() ?
-                    resources.getDimensionPixelSize(R.dimen.taskbar_phone_size) :
-                    resources.getDimensionPixelSize(R.dimen.taskbar_stashed_size);
+            return isThreeButtonNav()
+                    ? resources.getDimensionPixelSize(R.dimen.taskbar_phone_size)
+                    : showPill ? resources.getDimensionPixelSize(R.dimen.taskbar_stashed_size) : 1;
         }
 
         if (!isUserSetupComplete()) {

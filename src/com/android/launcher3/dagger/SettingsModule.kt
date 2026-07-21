@@ -17,6 +17,7 @@
 package com.android.launcher3.dagger
 
 import android.net.Uri
+import com.android.launcher3.taskbar.TaskbarManagerImpl.SHOW_NAVIGATION_PILL_URI
 import com.android.launcher3.util.SettingsCache.NOTIFICATION_BADGING_URI
 import com.android.launcher3.util.SettingsCache.TOUCHPAD_NATURAL_SCROLLING
 import dagger.Module
@@ -26,6 +27,11 @@ import javax.inject.Named
 
 @Module
 object SettingsModule {
+
+    @Provides
+    @IntoSet
+    @Named("SETTINGS_ENABLED_BY_DEFAULT")
+    fun provideNavigationBarPillDefaults(): Uri = SHOW_NAVIGATION_PILL_URI
 
     @Provides
     @IntoSet

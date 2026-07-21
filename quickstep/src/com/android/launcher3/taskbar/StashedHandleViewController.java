@@ -21,6 +21,7 @@ import static android.view.WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BA
 import static com.android.launcher3.EncryptionType.ENCRYPTED;
 import static com.android.launcher3.LauncherPrefs.nonRestorableItem;
 import static com.android.launcher3.taskbar.Utilities.getShapedTaskbarRadius;
+import static com.android.launcher3.taskbar.TaskbarManagerImpl.SHOW_NAVIGATION_PILL_URI;
 import static com.android.systemui.shared.system.QuickStepContract.SYSUI_STATE_NAV_BAR_HIDDEN;
 
 import android.animation.Animator;
@@ -30,6 +31,7 @@ import android.app.TaskInfo;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Outline;
+import android.provider.Settings;
 import android.graphics.Rect;
 import android.view.View;
 import android.view.ViewOutlineProvider;
@@ -47,6 +49,7 @@ import com.android.launcher3.anim.RevealOutlineAnimation;
 import com.android.launcher3.anim.RoundedRectRevealOutlineProvider;
 import com.android.launcher3.util.Executors;
 import com.android.launcher3.util.MultiValueAlpha;
+import com.android.launcher3.util.SettingsCache;
 import com.android.quickstep.NavHandle;
 import com.android.quickstep.TopTaskTracker;
 import com.android.systemui.shared.system.QuickStepContract.SystemUiStateFlags;
@@ -147,8 +150,9 @@ public class StashedHandleViewController implements TaskbarControllers.LoggableT
         mStashedHandleView.updateHandleColor(
                 mPrefs.get(STASHED_HANDLE_REGION_IS_DARK), false /* animate */);
         final Resources resources = activity.getResources();
-        mStashedHandleHeight = resources.getDimensionPixelSize(
-                R.dimen.taskbar_stashed_handle_height);
+        mStashedHandleHeight = resources.getDimensionPixelSize(pillHandleHeightDimen(
+                Settings.Secure.getInt(activity.getContentResolver(),
+                        Settings.Secure.PILL_HEIGHT_MODE, 3)));
         float density = resources.getDisplayMetrics().density;
         mHorizontalMaxShift = 12 * density;
         mVerticalMaxShift = 6 * density;
@@ -161,18 +165,26 @@ public class StashedHandleViewController implements TaskbarControllers.LoggableT
         TaskbarActivityContext activity = Objects.requireNonNull(mActivityRef.get());
         DeviceProfile deviceProfile = activity.getDeviceProfile();
         Resources resources = activity.getResources();
+        int handleWidthMode = Settings.Secure.getInt(activity.getContentResolver(),
+                Settings.Secure.PILL_LENGTH_MODE, 1);
+        boolean showPill = SettingsCache.INSTANCE.get(activity).getValue(SHOW_NAVIGATION_PILL_URI);
         if (activity.isPhoneGestureNavMode() || activity.isTinyTaskbar()
                 || activity.isBubbleBarOnPhone()) {
             mTaskbarSize = resources.getDimensionPixelSize(R.dimen.taskbar_phone_size);
-            mStashedHandleWidth =
-                    resources.getDimensionPixelSize(R.dimen.taskbar_stashed_small_screen);
+            mStashedHandleWidth = resources.getDimensionPixelSize(
+                    handleWidthMode == 0 ? R.dimen.taskbar_stashed_small_screen_short
+                    : handleWidthMode == 2 ? R.dimen.taskbar_stashed_small_screen_long
+                    : R.dimen.taskbar_stashed_small_screen);
         } else {
             mTaskbarSize = deviceProfile.getTaskbarProfile().getHeight();
-            mStashedHandleWidth = resources
-                    .getDimensionPixelSize(R.dimen.taskbar_stashed_handle_width);
+            mStashedHandleWidth = resources.getDimensionPixelSize(
+                    handleWidthMode == 0 ? R.dimen.taskbar_stashed_handle_width_short
+                    : handleWidthMode == 2 ? R.dimen.taskbar_stashed_handle_width_long
+                    : R.dimen.taskbar_stashed_handle_width);
         }
         int taskbarBottomMargin = deviceProfile.getTaskbarProfile().getBottomMargin();
-        mStashedHandleView.getLayoutParams().height = mTaskbarSize + taskbarBottomMargin;
+        mStashedHandleView.getLayoutParams().height =
+                showPill ? mTaskbarSize + taskbarBottomMargin : 1;
 
         mTaskbarStashedHandleAlpha.get(ALPHA_INDEX_STASHED).setValue(
                 activity.isPhoneGestureNavMode() ? 1 : 0);
@@ -469,6 +481,16 @@ public class StashedHandleViewController implements TaskbarControllers.LoggableT
     @Override
     public Rect getBoundsOnScreen() {
         return mStashedHandleView.getSampledRegion();
+    }
+
+    public static int pillHandleHeightDimen(int mode) {
+        switch (mode) {
+            case 0: return R.dimen.taskbar_stashed_handle_height_smallest;
+            case 1: return R.dimen.taskbar_stashed_handle_height_smaller;
+            case 2: return R.dimen.taskbar_stashed_handle_height_small;
+            case 4: return R.dimen.taskbar_stashed_handle_height_tall;
+            default: return R.dimen.taskbar_stashed_handle_height;
+        }
     }
 
     private void startBurnInProtection() {
