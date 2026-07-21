@@ -164,6 +164,7 @@
     <string name="settings_button_text" msgid="8873672322605444408">"Kezdőképernyő beállításai"</string>
     <string name="msg_disabled_by_admin" msgid="6898038085516271325">"A rendszergazda letiltotta"</string>
     <string name="settings_home_organizer" msgid="5184766349407080054">"Otthonrendező"</string>
+    <string name="allow_rotation_title">A kezdőképernyő elforgatásának engedélyezése</string>
     <string name="allow_rotation_desc" msgid="8662546029078692509">"A telefon elforgatásakor"</string>
     <string name="compose_developer_options_section" msgid="8211460486549952595">"Jetpack Compose"</string>
     <string name="enable_composition_tracing_title" msgid="8989606591739368424">"Kompozíció nyomon követésének engedélyezése"</string>
