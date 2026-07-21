@@ -204,6 +204,25 @@ public class NavbarButtonsViewController implements TaskbarControllers.LoggableT
     // Used for IME+A11Y buttons
     private final ViewGroup mEndContextualContainer;
     private final ViewGroup mStartContextualContainer;
+
+    // Burn-in protection: bounded zig-zag drift in three-button mode, on translation channels
+    // not used by the bubble-bar teleport (container X) or the nav-button Y offset (parent Y).
+    private static final boolean BURN_IN_PROTECTION_ENABLED = true;
+    private static final long BURN_IN_SHIFT_INTERVAL_MS = 60_000L;
+    private boolean mBurnInActive;
+    private float mBurnInX;
+    private float mBurnInY;
+    private float mBurnInMaxShiftX;
+    private float mBurnInMaxShiftY;
+    private float mBurnInShiftStepX;
+    private float mBurnInShiftStepY;
+    private final Runnable mBurnInShiftRunnable = new Runnable() {
+        @Override
+        public void run() {
+            shiftNavButtons();
+            mNavButtonsView.postDelayed(this, BURN_IN_SHIFT_INTERVAL_MS);
+        }
+    };
     private final int mLightIconColorOnWorkspace;
     private final int mDarkIconColorOnWorkspace;
     /** Color to use for navbar buttons, if they are on on a Taskbar surface background. */
@@ -321,6 +340,7 @@ public class NavbarButtonsViewController implements TaskbarControllers.LoggableT
     public void init(TaskbarControllers controllers) {
         mControllers = controllers;
         setupController();
+        startBurnInProtection();
     }
 
     protected void setupController() {
@@ -1234,6 +1254,7 @@ public class NavbarButtonsViewController implements TaskbarControllers.LoggableT
     }
 
     public void onDestroy() {
+        stopBurnInProtection();
         mPropertyHolders.clear();
         if (mFloatingRotationButton != null) {
             mFloatingRotationButton.hide();
@@ -1566,4 +1587,47 @@ public class NavbarButtonsViewController implements TaskbarControllers.LoggableT
             }
         }
     }
+
+    private void startBurnInProtection() {
+        mNavButtonsView.removeCallbacks(mBurnInShiftRunnable);
+        // Only three-button mode shows static nav buttons; gesture mode uses the stashed handle.
+        if (!BURN_IN_PROTECTION_ENABLED || !mContext.isThreeButtonNav()) {
+            mBurnInActive = false;
+            return;
+        }
+        mBurnInActive = true;
+        float density = mContext.getResources().getDisplayMetrics().density;
+        mBurnInMaxShiftX = 12 * density;
+        mBurnInMaxShiftY = 6 * density;
+        mBurnInShiftStepX = mBurnInMaxShiftX / 3f;
+        mBurnInShiftStepY = mBurnInMaxShiftY / 3f;
+        mNavButtonsView.postDelayed(mBurnInShiftRunnable, BURN_IN_SHIFT_INTERVAL_MS);
+    }
+
+    private void stopBurnInProtection() {
+        mNavButtonsView.removeCallbacks(mBurnInShiftRunnable);
+        if (mBurnInActive) {
+            mBurnInActive = false;
+            mBurnInX = 0f;
+            mBurnInY = 0f;
+            mNavButtonsView.setTranslationX(0f);
+            mNavButtonContainer.setTranslationY(0f);
+        }
+    }
+
+    private void shiftNavButtons() {
+        mBurnInX += mBurnInShiftStepX;
+        if (mBurnInX >= mBurnInMaxShiftX || mBurnInX <= -mBurnInMaxShiftX) {
+            mBurnInShiftStepX *= -1;
+        }
+        mBurnInY += mBurnInShiftStepY;
+        if (mBurnInY >= mBurnInMaxShiftY || mBurnInY <= -mBurnInMaxShiftY) {
+            mBurnInShiftStepY *= -1;
+        }
+        // Free channels: parent X (bubble teleport uses container X) and container Y (parent Y
+        // carries the nav-button offset).
+        mNavButtonsView.setTranslationX(mBurnInX);
+        mNavButtonContainer.setTranslationY(mBurnInY);
+    }
+
 }

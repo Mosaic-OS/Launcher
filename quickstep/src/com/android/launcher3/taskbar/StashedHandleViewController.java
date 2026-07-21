@@ -118,6 +118,23 @@ public class StashedHandleViewController implements TaskbarControllers.LoggableT
 
     private float mTranslationYForSwipe;
     private float mTranslationYForStash;
+
+    // Burn-in protection: slow bounded zig-zag drift of the handle to avoid OLED burn-in.
+    private static final boolean BURN_IN_PROTECTION_ENABLED = true;
+    private static final long BURN_IN_SHIFT_INTERVAL_MS = 60_000L;
+    private float mTranslationXForBurnIn;
+    private float mTranslationYForBurnIn;
+    private final float mHorizontalMaxShift;
+    private final float mVerticalMaxShift;
+    private float mHorizontalShiftStep;
+    private float mVerticalShiftStep;
+    private final Runnable mBurnInShiftRunnable = new Runnable() {
+        @Override
+        public void run() {
+            shiftHandle();
+            mStashedHandleView.postDelayed(this, BURN_IN_SHIFT_INTERVAL_MS);
+        }
+    };
     private TaskStackChangeListener mTaskStackChangeListener;
 
     public StashedHandleViewController(TaskbarActivityContext activity,
@@ -132,6 +149,11 @@ public class StashedHandleViewController implements TaskbarControllers.LoggableT
         final Resources resources = activity.getResources();
         mStashedHandleHeight = resources.getDimensionPixelSize(
                 R.dimen.taskbar_stashed_handle_height);
+        float density = resources.getDisplayMetrics().density;
+        mHorizontalMaxShift = 12 * density;
+        mVerticalMaxShift = 6 * density;
+        mHorizontalShiftStep = mHorizontalMaxShift / 3f;
+        mVerticalShiftStep = mVerticalMaxShift / 3f;
     }
 
     public void init(TaskbarControllers controllers) {
@@ -202,6 +224,7 @@ public class StashedHandleViewController implements TaskbarControllers.LoggableT
             TaskStackChangeListeners.getInstance().registerTaskStackListener(
                     mTaskStackChangeListener);
         }
+        startBurnInProtection();
     }
 
     /**
@@ -231,6 +254,7 @@ public class StashedHandleViewController implements TaskbarControllers.LoggableT
 
 
     public void onDestroy() {
+        stopBurnInProtection();
         if (mRegionSamplingHelper != null) {
             mRegionSamplingHelper.stopAndDestroy();
         }
@@ -352,7 +376,9 @@ public class StashedHandleViewController implements TaskbarControllers.LoggableT
     }
 
     private void updateTranslationY() {
-        mStashedHandleView.setTranslationY(mTranslationYForSwipe + mTranslationYForStash);
+        mStashedHandleView.setTranslationX(mTranslationXForBurnIn);
+        mStashedHandleView.setTranslationY(
+                mTranslationYForSwipe + mTranslationYForStash + mTranslationYForBurnIn);
     }
 
     /**
@@ -444,4 +470,29 @@ public class StashedHandleViewController implements TaskbarControllers.LoggableT
     public Rect getBoundsOnScreen() {
         return mStashedHandleView.getSampledRegion();
     }
+
+    private void startBurnInProtection() {
+        if (!BURN_IN_PROTECTION_ENABLED) return;
+        mStashedHandleView.removeCallbacks(mBurnInShiftRunnable);
+        mStashedHandleView.postDelayed(mBurnInShiftRunnable, BURN_IN_SHIFT_INTERVAL_MS);
+    }
+
+    private void stopBurnInProtection() {
+        mStashedHandleView.removeCallbacks(mBurnInShiftRunnable);
+    }
+
+    private void shiftHandle() {
+        mTranslationXForBurnIn += mHorizontalShiftStep;
+        if (mTranslationXForBurnIn >= mHorizontalMaxShift
+                || mTranslationXForBurnIn <= -mHorizontalMaxShift) {
+            mHorizontalShiftStep *= -1;
+        }
+        mTranslationYForBurnIn += mVerticalShiftStep;
+        if (mTranslationYForBurnIn >= mVerticalMaxShift
+                || mTranslationYForBurnIn <= -mVerticalMaxShift) {
+            mVerticalShiftStep *= -1;
+        }
+        updateTranslationY();
+    }
+
 }
