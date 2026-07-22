@@ -278,4 +278,8 @@
     <string name="organizer_choose_layout_title" msgid="127228966942084947">"Elrendezés kiválasztása"</string>
     <string name="pref_dt_gesture_title">Dupla érintésre alvó mód</string>
     <string name="pref_dt_gesture_summary">Koppintson duplán üres területre a képernyő kikapcsolásához</string>
+	<string name="recents_category_title">Előzmények</string>
+    <string name="clear_all_position_title">Az „Összes törlése” gomb helye</string>
+    <string name="clear_all_position_left">Bal oldalon (alapértelmezett)</string>
+    <string name="clear_all_position_middle">Középen</string>
 </resources>

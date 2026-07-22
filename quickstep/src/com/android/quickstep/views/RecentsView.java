@@ -1044,6 +1044,8 @@ public abstract class RecentsView<
         mActionsView.updateHiddenFlags(HIDDEN_NO_TASKS, !hasTaskViews());
         // Update flags for 1p/3p launchers
         mActionsView.updateFor3pLauncher(mIs3PLauncher);
+        mActionsView.findViewById(R.id.action_clear_all)
+                .setOnClickListener(this::dismissAllTasks);
 
         // RecentsViewContainer provided dependencies.
         mSplitSelectStateController = splitController;
@@ -1521,6 +1523,10 @@ public abstract class RecentsView<
     public void setOverviewStateEnabled(boolean enabled) {
         if (mOverviewStateEnabled && !enabled) {
             mHelper.startPreloading();
+        }
+        if (enabled && mActionsView != null) {
+            mActionsView.findViewById(R.id.action_clear_all).setVisibility(
+                    Utilities.isClearAllInActionsBar(getContext()) ? VISIBLE : GONE);
         }
         mOverviewStateEnabled = enabled;
         updateTaskStackListenerState();

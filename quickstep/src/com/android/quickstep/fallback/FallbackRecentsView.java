@@ -30,6 +30,7 @@ import android.view.ViewGroup;
 
 import androidx.annotation.Nullable;
 
+import com.android.launcher3.Utilities;
 import com.android.launcher3.desktop.DesktopRecentsTransitionController;
 import com.android.launcher3.logging.StatsLogManager;
 import com.android.launcher3.statehandlers.DesktopVisibilityController;
@@ -296,7 +297,8 @@ public abstract class FallbackRecentsView<CONTAINER_TYPE extends Context & Recen
         super.setOverviewStateEnabled(enabled);
         if (enabled) {
             RecentsState state = mContainer.getStateManager().getState();
-            setDisallowScrollToClearAll(!state.hasClearAllButton());
+            setDisallowScrollToClearAll(!state.hasClearAllButton()
+                    || Utilities.isClearAllInActionsBar(getContext()));
         }
     }
 

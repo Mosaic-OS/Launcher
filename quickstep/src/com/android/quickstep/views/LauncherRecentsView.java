@@ -34,6 +34,7 @@ import androidx.annotation.Nullable;
 
 import com.android.launcher3.Launcher;
 import com.android.launcher3.LauncherState;
+import com.android.launcher3.Utilities;
 import com.android.launcher3.desktop.DesktopRecentsTransitionController;
 import com.android.launcher3.logging.StatsLogManager;
 import com.android.launcher3.statehandlers.DepthController;
@@ -196,7 +197,8 @@ public class LauncherRecentsView extends RecentsView<QuickstepLauncher, Launcher
             LauncherState state = getStateManager().getState();
             boolean hasClearAllButton = (state.getVisibleElements(mContainer.getLauncherUiState())
                             & CLEAR_ALL_BUTTON) != 0;
-            setDisallowScrollToClearAll(!hasClearAllButton);
+            setDisallowScrollToClearAll(!hasClearAllButton
+                    || Utilities.isClearAllInActionsBar(getContext()));
         }
     }
 

@@ -718,4 +718,18 @@
     <string name="pref_dt_gesture_title">Double tap to sleep</string>
     <string name="pref_dt_gesture_summary">Double tap on empty space to turn screen off</string>
 
+    <!-- Recents Clear all button position -->
+    <string name="recents_category_title">Recents</string>
+    <string name="clear_all_position_title">Clear all button position</string>
+    <string name="clear_all_position_left">Left (default)</string>
+    <string name="clear_all_position_middle">Middle</string>
+    <string-array name="clear_all_position_entries">
+        <item>@string/clear_all_position_left</item>
+        <item>@string/clear_all_position_middle</item>
+    </string-array>
+    <string-array name="clear_all_position_values" translatable="false">
+        <item>left</item>
+        <item>middle</item>
+    </string-array>
+
 </resources>

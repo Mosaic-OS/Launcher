@@ -56,4 +56,19 @@
         android:defaultValue="false"
         android:persistent="true" />
 
+    <PreferenceCategory
+        android:key="recents_category"
+        android:title="@string/recents_category_title">
+
+        <ListPreference
+            android:key="pref_clear_all_position"
+            android:title="@string/clear_all_position_title"
+            android:summary="%s"
+            android:entries="@array/clear_all_position_entries"
+            android:entryValues="@array/clear_all_position_values"
+            android:defaultValue="left"
+            android:persistent="true" />
+
+    </PreferenceCategory>
+
 </androidx.preference.PreferenceScreen>
