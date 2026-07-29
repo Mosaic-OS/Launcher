@@ -23,6 +23,7 @@ import static android.view.Surface.ROTATION_180;
 import static android.view.Surface.ROTATION_270;
 import static android.view.Surface.ROTATION_90;
 
+import static com.android.launcher3.LauncherPrefs.ALLOW_ROTATION;
 import static com.android.launcher3.LauncherPrefs.FIXED_LANDSCAPE_MODE;
 import static com.android.launcher3.util.Executors.MAIN_EXECUTOR;
 import static com.android.launcher3.util.Executors.UI_HELPER_EXECUTOR;
@@ -113,6 +114,9 @@ public class RecentsOrientedState implements LauncherPrefChangeListener {
 
     // Shared prefs for fixed 90 degree rotation, activities should rotate if they support it
     private static final int FLAG_HOME_FIXED_LANDSCAPE_PREFS = 1 << 10;
+
+    // Shared prefs for home rotation, the activity rotates instead of faking the rotation
+    private static final int FLAG_HOME_ROTATION_ALLOWED_PREFS = 1 << 11;
 
     private static final int MASK_MULTIPLE_ORIENTATION_SUPPORTED_BY_DEVICE =
             FLAG_MULTIPLE_ORIENTATION_SUPPORTED_BY_ACTIVITY
@@ -314,6 +318,9 @@ public class RecentsOrientedState implements LauncherPrefChangeListener {
         if (LauncherPrefs.FIXED_LANDSCAPE_MODE.getSharedPrefKey().equals(s)) {
             updateFixedLandscapeSetting();
         }
+        if (LauncherPrefs.ALLOW_ROTATION.getSharedPrefKey().equals(s)) {
+            updateHomeRotationSetting();
+        }
     }
 
     private Unit updateAutoRotateSetting() {
@@ -331,22 +338,27 @@ public class RecentsOrientedState implements LauncherPrefChangeListener {
         );
     }
 
+    private void updateHomeRotationSetting() {
+        setFlag(FLAG_HOME_ROTATION_ALLOWED_PREFS, LauncherPrefs.get(mContext).get(ALLOW_ROTATION));
+    }
+
     private void initFlags() {
         setFlag(FLAG_ROTATION_WATCHER_SUPPORTED, mOrientationListener.canDetectOrientation());
 
         // initialize external flags
         updateAutoRotateSetting();
         updateFixedLandscapeSetting();
+        updateHomeRotationSetting();
     }
 
     private void initMultipleOrientationListeners() {
-        LauncherPrefs.get(mContext).addListener(this, FIXED_LANDSCAPE_MODE);
+        LauncherPrefs.get(mContext).addListener(this, FIXED_LANDSCAPE_MODE, ALLOW_ROTATION);
         mRotationChangeSafeCloseable = mSettingsCache.getListenableRef(ROTATION_SETTING_URI)
                 .forEach(MAIN_EXECUTOR, (v) -> updateAutoRotateSetting());
     }
 
     private void destroyMultipleOrientationListeners() {
-        LauncherPrefs.get(mContext).removeListener(this, FIXED_LANDSCAPE_MODE);
+        LauncherPrefs.get(mContext).removeListener(this, FIXED_LANDSCAPE_MODE, ALLOW_ROTATION);
         if (mRotationChangeSafeCloseable != null) {
             mRotationChangeSafeCloseable.close();
             mRotationChangeSafeCloseable = null;
@@ -426,7 +438,8 @@ public class RecentsOrientedState implements LauncherPrefChangeListener {
         return ((mFlags & MASK_MULTIPLE_ORIENTATION_SUPPORTED_BY_DEVICE)
                 != MASK_MULTIPLE_ORIENTATION_SUPPORTED_BY_DEVICE)
                 || (mFlags & (FLAG_IGNORE_ALLOW_HOME_ROTATION_PREF
-                | FLAG_HOME_ROTATION_FORCE_ENABLED_FOR_TESTING)) != 0;
+                | FLAG_HOME_ROTATION_FORCE_ENABLED_FOR_TESTING
+                | FLAG_HOME_ROTATION_ALLOWED_PREFS)) != 0;
     }
 
     /**
