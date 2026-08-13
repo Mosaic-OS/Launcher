@@ -397,7 +397,7 @@ public class NavbarButtonsViewController implements TaskbarControllers.LoggableT
         // Potentially force the back button to be visible during setup wizard. The back button
         // won't show up if the expressive theme is enabled and simple view is disabled
         final boolean shouldShowInSetup = !mContext.isUserSetupComplete()
-                && (!mIsExpressiveThemeEnabled || mContext.isSimpleViewEnabled());
+                && (!mContext.isGestureNav() || mContext.isSimpleViewEnabled());
         final boolean alwaysShowButtons = isThreeButtonNav || shouldShowInSetup;
 
         // Make sure to remove nav bar buttons translation when any of the following occur:
@@ -619,7 +619,7 @@ public class NavbarButtonsViewController implements TaskbarControllers.LoggableT
         if (mContext == null) {
             return false;
         }
-        return !mContext.isUserSetupComplete() && mIsExpressiveThemeEnabled
+        return !mContext.isUserSetupComplete() && mContext.isGestureNav()
                 && !mContext.isSimpleViewEnabled();
     }
 
@@ -1165,8 +1165,8 @@ public class NavbarButtonsViewController implements TaskbarControllers.LoggableT
     }
 
     private void handleSetupUi() {
-        // Setup wizard handles the UI when the expressive theme is enabled and Simple View isn't.
-        if (mIsExpressiveThemeEnabled && !mContext.isSimpleViewEnabled()) {
+        // With gestures there are no setup buttons to align.
+        if (mContext.isGestureNav() && !mContext.isSimpleViewEnabled()) {
             return;
         }
         // Since setup wizard only has back button enabled, it looks strange to be
