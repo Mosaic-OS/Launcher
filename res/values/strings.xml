@@ -190,6 +190,22 @@
 
     <string name="all_apps_list_label">Apps list</string>
 
+    <!-- Title of the row that offers the on-device assistant in search results. [CHAR_LIMIT=50] -->
+    <string name="assistant_row_title">Ask Mosaic</string>
+    <!-- Shown when the on-device assistant could not answer at all. [CHAR_LIMIT=60] -->
+    <string name="assistant_row_unavailable">The assistant is not available right now</string>
+
+    <!-- Title of the assistant settings section. [CHAR_LIMIT=50] -->
+    <string name="assistant_category_title">Assistant</string>
+    <!-- Title of the switch that controls the Home menu assistant shortcut. [CHAR_LIMIT=50] -->
+    <string name="assistant_menu_visibility_title">Show AI assistant</string>
+    <!-- Summary of the switch that controls the Home menu assistant shortcut. [CHAR_LIMIT=NONE] -->
+    <string name="assistant_menu_visibility_summary">Show the AI assistant shortcut in the Home screen touch-and-hold menu</string>
+    <!-- Summary shown when Mosaic is not the default digital assistant. [CHAR_LIMIT=NONE] -->
+    <string name="assistant_menu_visibility_summary_not_selected">Select Mosaic in the system Default digital assistant setting to use this option</string>
+    <!-- Label for opening the on-device assistant from the Home screen menu. [CHAR_LIMIT=30] -->
+    <string name="assistant_menu_label">AI assistant</string>
+
     <!-- Popup items -->
     <!-- Text to display as the header above notifications. [CHAR_LIMIT=30] -->
     <string name="notifications_header">Notifications</string>

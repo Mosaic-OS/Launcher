@@ -21,6 +21,7 @@ import android.content.Intent
 import android.text.TextUtils
 import android.view.View
 import android.widget.Toast
+import com.android.launcher3.AbstractFloatingView
 import com.android.launcher3.BuildConfig
 import com.android.launcher3.Flags
 import com.android.launcher3.Launcher
@@ -28,6 +29,8 @@ import com.android.launcher3.LauncherSettings.Favorites
 import com.android.launcher3.LauncherState
 import com.android.launcher3.R
 import com.android.launcher3.Utilities
+import com.android.launcher3.assistant.AssistantLauncher
+import com.android.launcher3.assistant.AssistantPrefs
 import com.android.launcher3.config.FeatureFlags
 import com.android.launcher3.homescreenfiles.HomeScreenFilesProvider
 import com.android.launcher3.homescreenfiles.HomeScreenFilesUpdate.Extras.Companion.builder
@@ -132,6 +135,20 @@ object WorkspaceLongPressOptions {
                                     OrganizerActivity.MODE_WORKSPACE,
                                 )
                         )
+                }
+            )
+        }
+
+        if (AssistantPrefs.shouldShowInHomeMenu(ctx)) {
+            add(
+                PopupData(
+                    R.drawable.ic_assistant_spark,
+                    R.string.assistant_menu_label,
+                    SYSTEM_SHORTCUT,
+                    IGNORE,
+                ) { ac, _, v ->
+                    AbstractFloatingView.closeAllOpenViews(ac)
+                    AssistantLauncher.launch(ac.asContext(), source = v)
                 }
             )
         }

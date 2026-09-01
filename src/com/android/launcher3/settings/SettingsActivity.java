@@ -57,6 +57,7 @@ import com.android.launcher3.BuildConfig;
 import com.android.launcher3.InvariantDeviceProfile;
 import com.android.launcher3.LauncherFiles;
 import com.android.launcher3.R;
+import com.android.launcher3.assistant.AssistantAvailability;
 import com.android.launcher3.display.DisplayController;
 import com.android.launcher3.display.LauncherDisplayInfo;
 import com.android.launcher3.states.RotationHelper;
@@ -77,6 +78,10 @@ public class SettingsActivity extends FragmentActivity
     public static final String FIXED_LANDSCAPE_MODE = "pref_fixed_landscape_mode";
 
     private static final String NOTIFICATION_DOTS_PREFERENCE_KEY = "pref_icon_badging";
+
+    private static final String ASSISTANT_CATEGORY_KEY = "assistant_category";
+
+    private static final String ASSISTANT_PREFERENCE_KEY = "pref_assistant_enabled";
 
     public static final String EXTRA_FRAGMENT_ARGS = ":settings:fragment_args";
 
@@ -230,7 +235,7 @@ public class SettingsActivity extends FragmentActivity
                     screen.removePreference(preference);
                 }
             }
-
+            updateAssistantPreference();
             // If the target preference is not in the current preference screen, find the parent
             // preference screen that contains the target preference and set it as the preference
             // screen.
@@ -319,6 +324,8 @@ public class SettingsActivity extends FragmentActivity
             switch (preference.getKey()) {
                 case NOTIFICATION_DOTS_PREFERENCE_KEY:
                     return BuildConfig.NOTIFICATION_DOTS_ENABLED;
+                case ASSISTANT_CATEGORY_KEY:
+                    return AssistantAvailability.isInstalled(getContext());
                 case ALLOW_ROTATION_PREFERENCE_KEY:
                     if (info.isLargeScreen(info.realBounds)) {
                         // Large screens rotate by default, so hide the setting.
@@ -357,9 +364,23 @@ public class SettingsActivity extends FragmentActivity
             return true;
         }
 
+        private void updateAssistantPreference() {
+            Preference preference = findPreference(ASSISTANT_PREFERENCE_KEY);
+            if (preference == null || getContext() == null) {
+                return;
+            }
+            boolean selected = AssistantAvailability.isSelected(getContext());
+            preference.setEnabled(selected);
+            preference.setSummary(selected
+                    ? R.string.assistant_menu_visibility_summary
+                    : R.string.assistant_menu_visibility_summary_not_selected);
+        }
+
         @Override
         public void onResume() {
             super.onResume();
+
+            updateAssistantPreference();
 
             if (isAdded() && !mPreferenceHighlighted) {
                 PreferenceHighlighter highlighter = createHighlighter();

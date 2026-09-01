@@ -24,6 +24,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.android.launcher3.R;
 import com.android.launcher3.allapps.ActivityAllAppsContainerView;
 import com.android.launcher3.allapps.BaseAllAppsAdapter.AdapterItem;
+import com.android.launcher3.assistant.AssistantAdapterProvider;
 import com.android.launcher3.views.ActivityContext;
 
 import java.util.List;
@@ -33,6 +34,8 @@ public class AllAppsSearchUiDelegate {
 
     protected final ActivityAllAppsContainerView<?> mAppsView;
     protected final ActivityContext mActivityContext;
+
+    private AssistantAdapterProvider mAdapterProvider;
 
     public AllAppsSearchUiDelegate(ActivityAllAppsContainerView<?> appsView) {
         mAppsView = appsView;
@@ -46,7 +49,9 @@ public class AllAppsSearchUiDelegate {
 
     /** Invoked when search results are updated in All Apps. */
     public void onSearchResultsChanged(List<AdapterItem> results, int searchResultCode) {
-        // Do nothing.
+        if (mAdapterProvider != null) {
+            mAdapterProvider.onResultsChanged(results);
+        }
     }
 
     /** Invoked when transition animations to go to search is completed . */
@@ -81,6 +86,7 @@ public class AllAppsSearchUiDelegate {
 
     /** Creates the adapter provider for the main section. */
     public SearchAdapterProvider<?> createMainAdapterProvider() {
-        return new DefaultSearchAdapterProvider(mActivityContext);
+        mAdapterProvider = new AssistantAdapterProvider(mActivityContext);
+        return mAdapterProvider;
     }
 }

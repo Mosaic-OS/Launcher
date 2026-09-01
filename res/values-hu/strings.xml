@@ -282,4 +282,11 @@
     <string name="clear_all_position_title">Az „Összes törlése” gomb helye</string>
     <string name="clear_all_position_left">Bal oldalon (alapértelmezett)</string>
     <string name="clear_all_position_middle">Középen</string>
+    <string name="assistant_row_title">Kérdezzen a Mosaictól</string>
+    <string name="assistant_row_unavailable">Az asszisztens jelenleg nem érhető el</string>
+    <string name="assistant_category_title">Asszisztens</string>
+    <string name="assistant_menu_visibility_title">MI asszisztens megjelenítése</string>
+    <string name="assistant_menu_visibility_summary">Az MI asszisztens megjelenítése a kezdőképernyő hosszan nyomva tartással elérhető menüjében</string>
+    <string name="assistant_menu_visibility_summary_not_selected">A beállítás használatához válassza ki a Mosaicot a rendszer Alapértelmezett digitális asszisztens beállításában</string>
+    <string name="assistant_menu_label">MI asszisztens</string>
 </resources>

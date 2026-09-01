@@ -44,6 +44,7 @@ import com.android.launcher3.allapps.ActivityAllAppsContainerView;
 import com.android.launcher3.allapps.AllAppsStore;
 import com.android.launcher3.allapps.BaseAllAppsAdapter.AdapterItem;
 import com.android.launcher3.allapps.SearchUiManager;
+import com.android.launcher3.assistant.AssistantSearchAlgorithm;
 import com.android.launcher3.search.SearchCallback;
 import com.android.launcher3.views.ActivityContext;
 
@@ -81,7 +82,6 @@ public class AppsSearchContainerLayout extends ExtendedEditText
 
         mLauncher = ActivityContext.lookupContext(context);
         mSearchBarController = new AllAppsSearchBarController();
-
         mSearchQueryBuilder = new SpannableStringBuilder();
         Selection.setSelection(mSearchQueryBuilder, 0);
         setHint(prefixTextWithIcon(getContext(), R.drawable.ic_allapps_search, getHint()));
@@ -167,7 +167,7 @@ public class AppsSearchContainerLayout extends ExtendedEditText
     public void initializeSearch(ActivityAllAppsContainerView<?> appsView) {
         mAppsView = appsView;
         mSearchBarController.initialize(
-                new DefaultAppSearchAlgorithm(getContext(), mLauncher.getUiExecutor(), true),
+                new AssistantSearchAlgorithm(getContext(), mLauncher.getUiExecutor()),
                 this, mLauncher, this);
     }
 
@@ -217,6 +217,9 @@ public class AppsSearchContainerLayout extends ExtendedEditText
     @Override
     public void onSearchResult(String query, ArrayList<AdapterItem> items) {
         if (items != null) {
+            // The delegate has to see the list before the adapter binds it, because that is
+            // how the assistant row learns which query it was built for.
+            mAppsView.getSearchUiDelegate().onSearchResultsChanged(items, SearchCallback.FINAL);
             mAppsView.setSearchResults(items);
         }
     }

@@ -58,6 +58,19 @@
         android:persistent="true" />
 
     <PreferenceCategory
+        android:key="assistant_category"
+        android:title="@string/assistant_category_title">
+
+        <SwitchPreferenceCompat
+            android:key="pref_assistant_enabled"
+            android:title="@string/assistant_menu_visibility_title"
+            android:summary="@string/assistant_menu_visibility_summary"
+            android:defaultValue="false"
+            android:persistent="true" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
         android:key="recents_category"
         android:title="@string/recents_category_title">
 

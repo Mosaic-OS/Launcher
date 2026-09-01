@@ -50,6 +50,10 @@
                      android:featureFlag="android.security.app_lock_apis" />
     <uses-permission android:name="com.android.systemui.permission.LAUNCH_ACCESSIBILITY_SHORTCUT_CHOOSER_DIALOG" />
 
+    <queries>
+        <package android:name="app.mosaicos.assistant" />
+    </queries>
+
     <permission
         android:name="${applicationId}.permission.GRID_CONTROL"
         android:knownCerts="@array/grid_control_known_signers"
