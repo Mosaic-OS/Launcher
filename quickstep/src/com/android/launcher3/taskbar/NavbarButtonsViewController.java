@@ -195,6 +195,7 @@ public class NavbarButtonsViewController implements TaskbarControllers.LoggableT
     private int mState;
 
     private final TaskbarActivityContext mContext;
+    private final WindowManager mSeparateWindowManager;
     private final @Nullable Context mNavigationBarPanelContext;
     private final WindowManagerProxy mWindowManagerProxy;
     private final NearestTouchFrame mNavButtonsView;
@@ -301,6 +302,8 @@ public class NavbarButtonsViewController implements TaskbarControllers.LoggableT
             @Nullable Context navigationBarPanelContext, NearestTouchFrame navButtonsView,
             Handler handler, TaskbarUiState taskbarUiState) {
         mContext = context;
+        mSeparateWindowManager = mContext.createWindowContext(TYPE_NAVIGATION_BAR_PANEL, null)
+                .getSystemService(WindowManager.class);
         mNavigationBarPanelContext = navigationBarPanelContext;
         mWindowManagerProxy = WindowManagerProxy.INSTANCE.get(mContext);
         mNavButtonsView = navButtonsView;
@@ -1306,7 +1309,7 @@ public class NavbarButtonsViewController implements TaskbarControllers.LoggableT
         mSeparateWindowParent.addView(mNavButtonsView);
         WindowManager.LayoutParams windowLayoutParams = mContext.createDefaultWindowLayoutParams(
                 TYPE_NAVIGATION_BAR_PANEL, NAV_BUTTONS_SEPARATE_WINDOW_TITLE);
-        mContext.addWindowView(mSeparateWindowParent, windowLayoutParams);
+        mSeparateWindowManager.addView(mSeparateWindowParent, windowLayoutParams);
 
     }
 
@@ -1319,7 +1322,7 @@ public class NavbarButtonsViewController implements TaskbarControllers.LoggableT
         }
 
         mAreNavButtonsInSeparateWindow = false;
-        mContext.removeWindowView(mSeparateWindowParent);
+        mSeparateWindowManager.removeViewImmediate(mSeparateWindowParent);
         mSeparateWindowParent.removeView(mNavButtonsView);
         mContext.getDragLayer().addView(mNavButtonsView);
     }
