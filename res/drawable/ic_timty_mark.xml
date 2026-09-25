@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     Copyright (C) 2026 The MosaicOS Project
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+          http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="344.62"
+    android:viewportHeight="344.62">
+
+    <group
+        android:translateX="3.285"
+        android:translateY="4.0">
+
+        <path
+            android:pathData="M253.218 48.4975L228.172 84.1692L169.025 0L109.877 84.1692L84.8312 48.4975L0.714844 168.31L84.8312 288.122L109.877 252.45L169.025 336.62L228.172 252.45L253.218 288.122L337.334 168.31L253.218 48.4975ZM169.025 239.625L143.979 203.953L118.932 168.31L143.979 132.667L169.025 96.995L194.071 132.667L219.117 168.31L194.071 203.953L169.025 239.625Z"
+            android:strokeWidth="8"
+            android:strokeColor="#000000">
+            <aapt:attr name="android:fillColor">
+                <gradient
+                    android:type="linear"
+                    android:startX="0"
+                    android:startY="0"
+                    android:endX="0"
+                    android:endY="344.62">
+                    <item android:offset="0" android:color="#FF8ABC" />
+                    <item android:offset="1" android:color="#5145E4" />
+                </gradient>
+            </aapt:attr>
+        </path>
+
+    </group>
+</vector>

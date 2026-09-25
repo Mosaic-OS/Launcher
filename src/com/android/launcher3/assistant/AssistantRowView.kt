@@ -69,6 +69,6 @@ class AssistantRowView @JvmOverloads constructor(
     }
 
     private companion object {
-        const val EXTRA_QUERY = "app.mosaicos.assistant.extra.QUERY"
+        const val EXTRA_QUERY = "apps.mosaicos.timty.extra.QUERY"
     }
 }

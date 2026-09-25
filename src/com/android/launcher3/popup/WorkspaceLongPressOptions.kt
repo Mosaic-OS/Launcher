@@ -142,7 +142,7 @@ object WorkspaceLongPressOptions {
         if (AssistantPrefs.shouldShowInHomeMenu(ctx)) {
             add(
                 PopupData(
-                    R.drawable.ic_assistant_spark,
+                    R.drawable.ic_timty_mark,
                     R.string.assistant_menu_label,
                     SYSTEM_SHORTCUT,
                     IGNORE,
