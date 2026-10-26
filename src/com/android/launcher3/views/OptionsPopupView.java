@@ -171,6 +171,9 @@ public class OptionsPopupView<T extends Context & ActivityContext> extends Arrow
                 view.getLayoutParams().width = width;
             }
             view.getIconView().setBackgroundDrawable(item.icon);
+            if (item.labelRes == R.string.assistant_menu_label) {
+                view.getIconView().setBackgroundTintList(null);
+            }
             view.getBubbleText().setText(item.label);
             view.setOnClickListener(popup);
             view.setOnLongClickListener(popup);

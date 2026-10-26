@@ -23,7 +23,7 @@ import android.provider.Settings
 
 object AssistantAvailability {
 
-    const val PACKAGE = "apps.mosaicos.timty"
+    const val PACKAGE = "apps.mosaicos.tabiti"
 
     @Volatile
     private var available: Boolean? = null

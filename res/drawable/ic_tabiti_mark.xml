@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     Copyright (C) 2026 The MosaicOS Project
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+          http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="1264.3567"
+    android:viewportHeight="1264.3567">
+    <group
+        android:scaleX="1.000000000000"
+        android:scaleY="1.000000000000"
+        android:translateX="320.331150000000"
+        android:translateY="0">
+        <path
+            android:pathData="M609.478,818.5987l-57.7837,55.0319,34.395-187.1083-82.5479-260.0255-104.5605-50.9044,
+                31.6436-107.3121-38.5225,6.879,70.1655-110.0637-15.1338-53.656-4.1274,49.5286-275.1592,
+                206.3694,101.8091,181.6052-136.2041,118.3184-15.1333-67.4139-85.2996,83.465L0,887.3885
+                l115.5669,198.1147,265.5288,178.8535,93.5542-16.5096,149.0445-337.0701-14.2164-92.1784Z
+                M277.911,376.2803l41.9618-37.1465-12.3822,114.879-29.5796-77.7325ZM232.5097,645.9363
+                l32.3312,3.4395-55.7197,59.8471,23.3885-63.2866ZM505.376,944.2547l-68.79,175.1848
+                -66.0381-6.4203-166.0127-163.2612-27.5156-137.5796,89.8853-77.0446,24.7642,19.2611,
+                65.1211-92.637-20.1782-147.6687,134.8276,102.7261,46.7773,96.3057-50.4458,234.8026,
+                37.605-3.6688ZM166.4715,478.7771l-59.1592-17.8854,2.7516-73.6051,56.4076,91.4904Z
+                M311.618,168.535l-66.7261,13.0701-13.758-44.7134,80.4841,31.6433ZM564.0766,103.8726l
+                -40.586,68.7898,8.9427-50.2166-35.7707-35.7707,67.414,17.1975ZM412.739,0l-55.0318,
+                48.1529L365.962.6879l46.7771-.6879Z">
+            <aapt:attr name="android:fillColor">
+                <gradient
+                    android:type="linear"
+                    android:startX="293.1386"
+                    android:startY="34.1127"
+                    android:endX="319.405"
+                    android:endY="1248.5074">
+                    <item android:offset="0" android:color="#f18229" />
+                    <item android:offset="1" android:color="#ec236f" />
+                </gradient>
+            </aapt:attr>
+        </path>
+    </group>
+</vector>

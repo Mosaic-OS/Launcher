@@ -143,6 +143,9 @@ open class PopupContainer<T : ActivityContext>(
                     inflateAndAdd(R.layout.system_shortcut, systemShortcutContainer)
 
                 view.iconView.setBackgroundResource(systemShortcut.iconResId)
+                if (systemShortcut.iconResId == R.drawable.ic_tabiti_mark) {
+                    view.iconView.backgroundTintList = null
+                }
                 view.bubbleText.setText(systemShortcut.labelResId)
 
                 view.tag = systemShortcut

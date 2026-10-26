@@ -48,8 +48,8 @@ object AssistantLauncher {
             .isSuccess
     }
 
-    const val ASSISTANT_ACTIVITY = "apps.mosaicos.timty.ui.AssistantActivity"
+    const val ASSISTANT_ACTIVITY = "apps.mosaicos.tabiti.ui.AssistantActivity"
 
-    private const val EXTRA_SOURCE_X = "apps.mosaicos.timty.extra.SOURCE_X"
-    private const val EXTRA_SOURCE_Y = "apps.mosaicos.timty.extra.SOURCE_Y"
+    private const val EXTRA_SOURCE_X = "apps.mosaicos.tabiti.extra.SOURCE_X"
+    private const val EXTRA_SOURCE_Y = "apps.mosaicos.tabiti.extra.SOURCE_Y"
 }

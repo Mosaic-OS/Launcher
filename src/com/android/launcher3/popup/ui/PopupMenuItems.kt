@@ -201,6 +201,8 @@ fun SystemShortcutMenuItem(
 ) {
     val title = stringResource(id = shortcut.labelResId)
     val painter: Painter = painterResource(id = shortcut.iconResId)
+    val iconTint = if (shortcut.iconResId == R.drawable.ic_tabiti_mark) Color.Unspecified
+        else colorResource(R.color.materialColorOnSurface)
     val interactionSource = remember { MutableInteractionSource() }
     val isHovered by interactionSource.collectIsHoveredAsState()
     val isFocused by interactionSource.collectIsFocusedAsState()
@@ -238,7 +240,7 @@ fun SystemShortcutMenuItem(
                 Icon(
                     painter = painter,
                     contentDescription = null,
-                    tint = colorResource(R.color.materialColorOnSurface),
+                    tint = iconTint,
                 )
             }
         }
@@ -248,7 +250,7 @@ fun SystemShortcutMenuItem(
             Icon(
                 painter = painter,
                 contentDescription = null,
-                tint = colorResource(R.color.materialColorOnSurface),
+                tint = iconTint,
             )
         }
 
