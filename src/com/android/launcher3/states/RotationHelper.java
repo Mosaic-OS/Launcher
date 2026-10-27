@@ -58,7 +58,8 @@ public class RotationHelper implements LauncherPrefChangeListener,
      * Returns the default value of {@link #ALLOW_ROTATION_PREFERENCE_KEY} preference.
      */
     public static boolean getAllowRotationDefaultValue(LauncherDisplayInfo info) {
-        return info.isRotationAllowed;
+        // Home rotation defaults to on only for large screens
+        return info.isLargeScreen(info.realBounds);
     }
 
     private boolean mIsFixedLandscape = false;
